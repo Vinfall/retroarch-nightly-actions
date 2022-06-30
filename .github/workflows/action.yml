@@ -2,7 +2,7 @@ name: "RetroArch Nightly Release"
 description: "Pull & Release Nightly RetroArch Releases from Official Buildbot"
 
 on:
-  shchedule:
+  schedule:
     # Trigger every day at 23:50 UTC
     - cron: "50 23 * * *"
 
