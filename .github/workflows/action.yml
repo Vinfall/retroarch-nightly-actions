@@ -2,6 +2,20 @@ name: "RetroArch Nightly Release"
 description: "Pull & Release Nightly RetroArch Releases from Official Buildbot"
 
 on:
+  push:
+    branches: main
+  workflow_dispatch:
+      inputs:
+       logLevel:
+        description: 'Log level'     
+        required: true
+        default: 'warning' 
+        type: choice
+        options:
+        - info
+        - warning
+        - debug
+  
   schedule:
     # Trigger every day at 23:50 UTC
     - cron: "50 23 * * *"
