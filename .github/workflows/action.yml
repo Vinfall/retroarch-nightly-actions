@@ -1,0 +1,56 @@
+name: "RetroArch Nightly Release"
+description: "Pull & Release Nightly RetroArch Releases from Official Buildbot"
+
+on:
+  shchedule:
+    # Trigger every day at 23:50 UTC
+    - cron: "50 23 * * *"
+
+jobs:
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      # Get files
+      - name: Download RetroArch apks
+        run: |
+          wget https://buildbot.libretro.com/nightly/android/RetroArch.apk
+          wget https://buildbot.libretro.com/nightly/android/RetroArch_aarch64.apk
+          wget https://buildbot.libretro.com/nightly/android/RetroArch_ra32.apk
+      - name: Commit files
+        run: |
+          git add .
+          # Commit using ISO date
+          date --iso-8601 | git commit -F -
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrects.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+      # Create tags using daily version
+      - uses: fregante/daily-version-action@v1
+        name: Create tag if necessary
+        id: daily-version
+      # Upload files
+      - if: steps.daily-version.outputs.created
+        name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: RetroArch*.apk
+          tag: ${{ steps.daily-version.outputs.version }}
+          overwrite: true
+          file_glob: true
+      # Create releases
+      - if: steps.daily-version.outputs.created
+        name: Creat release
+        uses: actions/create-release@latest
+        env:
+          # Token provided by Actions, no need to create your own
+          GITHUB_TOKEN: ${{ secrects.GITHUB_TOKEN }}
+          with:
+            tag_name: "${{ steps.daily-version.outputs.version }}"
+            release_name: "nightly"
+            body: "Latest nightly release"
+            draft: false
+            prerelease: false;
