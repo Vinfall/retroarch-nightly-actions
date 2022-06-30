@@ -5,16 +5,15 @@ on:
     branches: main
   workflow_dispatch:
       inputs:
-       logLevel:
-        description: 'Log level'     
-        required: true
-        default: 'warning' 
-        type: choice
-        options:
-        - info
-        - warning
-        - debug
-  
+        logLevel:
+          description: 'Log level'     
+          required: true
+          default: 'warning' 
+          type: choice
+          options:
+            - info
+            - warning
+            - debug
   schedule:
     # Trigger every day at 23:50 UTC
     - cron: "50 23 * * *"
@@ -24,6 +23,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal access token.
+          fetch-depth: 0 # otherwise, there would be errors pushing refs to the destination repository.
       # Get files
       - name: Download RetroArch apks
         run: |
@@ -32,6 +35,8 @@ jobs:
           wget https://buildbot.libretro.com/nightly/android/RetroArch_ra32.apk
       - name: Commit files
         run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
           git add .
           # Commit using ISO date
           date --iso-8601 | git commit -F -
@@ -39,7 +44,7 @@ jobs:
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrects.GITHUB_TOKEN }}
-          branch: ${{ github.ref }}
+          branch: main
       # Create tags using daily version
       - uses: fregante/daily-version-action@v1
         name: Create tag if necessary
@@ -60,7 +65,7 @@ jobs:
         uses: actions/create-release@latest
         env:
           # Token provided by Actions, no need to create your own
-          GITHUB_TOKEN: ${{ secrects.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           with:
             tag_name: "${{ steps.daily-version.outputs.version }}"
             release_name: "nightly"
