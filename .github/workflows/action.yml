@@ -60,15 +60,15 @@ jobs:
           overwrite: true
           file_glob: true
       # Create releases
-      name: Creat release
-      uses: actions/checkout@v2
-      uses: ncipollo/release-action@latest
-      env:
-        # Token provided by Actions, no need to create your own
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          commit: "${{ steps.daily-version.outputs.version }}"
-          release_name: "nightly"
-          body: "Latest nightly release"
-          draft: false
-          prerelease: false
+        name: Creat release
+        - uses: actions/checkout@v2
+        - uses: ncipollo/release-action@latest
+          env:
+          # Token provided by Actions, no need to create your own
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          with:
+            commit: "${{ steps.daily-version.outputs.version }}"
+            release_name: "nightly"
+            body: "Latest nightly release"
+            draft: false
+            prerelease: false
