@@ -61,7 +61,7 @@ jobs:
           file_glob: true
       # Create releases
       - uses: actions/checkout@v2
-      - uses: ncipollo/release-action@latest
+      - uses: ncipollo/release-action@v1
         with:
           commit: "${{ steps.daily-version.outputs.version }}"
           release_name: "nightly"
