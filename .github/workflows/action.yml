@@ -60,8 +60,8 @@ jobs:
           overwrite: true
           file_glob: true
       # Create releases
+      - uses: actions/checkout@v2
       - name: Creat release
-        uses: actions/checkout@v2
         uses: ncipollo/release-action@latest
         env:
         # Token provided by Actions, no need to create your own
