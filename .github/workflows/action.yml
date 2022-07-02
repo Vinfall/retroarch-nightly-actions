@@ -27,7 +27,7 @@ jobs:
         with:
           persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal access token.
           fetch-depth: 0 # otherwise, there would be errors pushing refs to the destination repository.
-      # Get files
+      # Commit files
       - name: Download RetroArch apks
         run: |
           wget https://buildbot.libretro.com/nightly/android/RetroArch.apk
@@ -60,15 +60,15 @@ jobs:
           overwrite: true
           file_glob: true
       # Create releases
-      - if: steps.daily-version.outputs.created
-        name: Creat release
-        uses: actions/create-release@latest
-        env:
-          # Token provided by Actions, no need to create your own
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            tag_name: "${{ steps.daily-version.outputs.version }}"
-            release_name: "nightly"
-            body: "Latest nightly release"
-            draft: false
-            prerelease: false
+      name: Creat release
+      uses: actions/checkout@v2
+      uses: ncipollo/release-action@latest
+      env:
+        # Token provided by Actions, no need to create your own
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          commit: "${{ steps.daily-version.outputs.version }}"
+          release_name: "nightly"
+          body: "Latest nightly release"
+          draft: false
+          prerelease: false
